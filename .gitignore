@@ -1,0 +1,4 @@
+##really need this ignored
+.vs/
+.bin/
+.obj/
