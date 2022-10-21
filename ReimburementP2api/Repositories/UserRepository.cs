@@ -55,5 +55,27 @@ namespace ReimburementP2api.Repositories
             }
 
         }
+
+        public void AddUser(User user)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        INSERT INTO Users
+                        (Name, UserName, Password, Email, IsAdmin)
+                        VALUES(@name, @userName, @pass, @email, 0);
+                    ";
+                    cmd.Parameters.AddWithValue("@name", user.Name);
+                    cmd.Parameters.AddWithValue("@userName", user.Username);
+                    cmd.Parameters.AddWithValue("@pass", user.Password);
+                    cmd.Parameters.AddWithValue("@email", user.Email);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }
