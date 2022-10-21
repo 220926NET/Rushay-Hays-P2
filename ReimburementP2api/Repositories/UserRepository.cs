@@ -1,17 +1,59 @@
-﻿using ReimburementP2api.Models;
+﻿using Microsoft.Data.SqlClient;
+using ReimburementP2api.Models;
 
 namespace ReimburementP2api.Repositories
 {
     public class UserRepository : BaseRepository, IUserRepository
     {
         public UserRepository(IConfiguration configuration) : base(configuration) { }
+
+
         public User GetUserByUserNameAndPass(string username, string password)
         {
-            User user = new User
+            using (var conn = Connection)
             {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @$"
+                        SELECT Id, [Name], UserName, [Password], Email, IsAdmin
+                        FROM Users 
+                        WHERE UserName = @username AND [Password] = @password 
+                    ";
 
-            };
-            return user;
+                    cmd.Parameters.AddWithValue("@username", username);
+                    cmd.Parameters.AddWithValue("@password", password);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            User acquiredUser = new User
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Username = reader.GetString(reader.GetOrdinal("UserName")),
+                                Password = reader.GetString(reader.GetOrdinal("Password")),
+                                Email = reader.GetString(reader.GetOrdinal("Email")),
+                                IsAdmin = reader.GetBoolean(reader.GetOrdinal("IsAdmin"))
+                            };
+
+                            return acquiredUser;
+                        }
+                        else
+                        {
+                            User notAUser = new User
+                            {
+                                Id = 0
+                            
+                            };
+                            return notAUser;
+                        }
+                    }
+                }
+
+            }
+
         }
     }
 }

@@ -18,9 +18,9 @@ namespace ReimburementP2api.Controllers
 
         // GET: api/<UserController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult GetUser(string username, string password)
         {
-            return new string[] { "value1", "value2" };
+            return Ok(_userRepository.GetUserByUserNameAndPass(username, password));
         }
 
         // GET api/<UserController>/5

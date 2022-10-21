@@ -3,4 +3,4 @@
 .bin/
 .obj/
 ## this is included so that my password in my connection string isn't visible to the whole world
-ReimburementP2api/appsettings.json
+appsettings.json
