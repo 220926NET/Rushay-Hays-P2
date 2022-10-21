@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using ReimburementP2api.Repositories;
+using ReimburementP2api.Models;   
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -32,8 +34,9 @@ namespace ReimburementP2api.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult AddUser(User user)
         {
+            return CreatedAtAction("Get", new { id = user.Id }, user);
         }
 
         // PUT api/<UserController>/5
