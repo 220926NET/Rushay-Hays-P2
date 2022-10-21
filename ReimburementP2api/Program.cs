@@ -12,6 +12,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 
+builder.Services.AddControllersWithViews(options => { options.SuppressAsyncSuffixInActionNames = false; });
+
 var app = builder.Build();
 
 //Configure the HTTP request pipeline.

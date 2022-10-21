@@ -8,6 +8,8 @@
         public decimal AmountRequest { get; set; }
         public string? Status { get; set; }
         public int UserId { get; set; }
+        public int ReviewerId { get; set; }
+        public string? EmployeeName { get; set; }
 
         public Ticket() { }
 

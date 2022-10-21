@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using ReimburementP2api.Models;
 using ReimburementP2api.Repositories;
 
@@ -17,31 +18,46 @@ namespace ReimburementP2api.Controllers
             _ticketRepository = ticketRepository;
         }
 
-        // GET: api/<TicketController>
+        //This will get a single ticket, this is not used by the end user but is instead required for the
+        //CreatedAtAction in POST to work correctly
         [HttpGet]
-        public IActionResult GetUser(int userId)
+        public IActionResult GetSingleTicket(int ticketId)
         {
-            return Ok(_ticketRepository.GetTicketsForUser(userId));
+            return Ok(_ticketRepository.GetTicketById(ticketId));
+        }
+
+        //This gets ALL the tickets previously submitted by the current user
+        // GET: api/<TicketController>
+        [HttpGet("userTickets/{id}")]
+        public IActionResult GetUsersTickets(int id)
+        {
+            return Ok(_ticketRepository.GetTicketsForUser(id));
         }
 
         // GET api/<TicketController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        //The id in this param is the USER's Id
+        [HttpGet("pending/{id}")]
+        public IActionResult GetAllPendingTicketsExceptForUsers(int id)
         {
-            return "value";
+            return Ok(_ticketRepository.GetAllPendingTickets(id));
         }
 
+        //This allows the current user to submit a ticket
         // POST api/<TicketController>
         [HttpPost]
         public IActionResult AddTicket(Ticket ticket)
         {
-            return CreatedAtAction("Get", new { id = ticket.Id }, ticket);
+            _ticketRepository.AddTicket(ticket);
+            return CreatedAtAction(nameof(GetSingleTicket), new { ticketId = ticket.Id}, ticket);
+            //return CreatedAtAction("PostAsync",ticket);
         }
 
         // PUT api/<TicketController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, int statId)
         {
+            _ticketRepository.UpdateTicket(id, statId);
+            return NoContent();
         }
 
         // DELETE api/<TicketController>/5

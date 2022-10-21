@@ -6,5 +6,10 @@ namespace ReimburementP2api.Repositories
     {
         List<Ticket> GetTicketsForUser(int userId);
         void AddTicket(Ticket ticket);
+        void UpdateTicket(int tID, int statID);
+
+        List<Ticket> GetAllPendingTickets(int userId);
+
+        Ticket GetTicketById(int tId);
     }
 }
