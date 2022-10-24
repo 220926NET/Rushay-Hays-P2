@@ -55,11 +55,12 @@ namespace ReimburementP2api.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest("Ticket must include a Note and an AmountRequested");
             }
             
         }
 
+        //This checks that the user is an Administrator, and that the ticket is 'pending'
         // PUT api/<TicketController>/5
         [HttpPut("{id}")]
         public IActionResult Put(int id, int statId, bool hasAdminPrivelige)
@@ -73,19 +74,19 @@ namespace ReimburementP2api.Controllers
                 }
                 else
                 {
-                    return BadRequest();
+                    return BadRequest("Only PENDING tickets may be reviewed");
                 }
             }
             else
             {
-                return BadRequest();
+                return BadRequest("You must be an Admin to Review tickets");
             }
         }
 
         // DELETE api/<TicketController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        //[HttpDelete("{id}")]
+        //public void Delete(int id)
+        //{
+        //}
     }
 }

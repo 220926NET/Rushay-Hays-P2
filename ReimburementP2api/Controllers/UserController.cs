@@ -43,7 +43,7 @@ namespace ReimburementP2api.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest("A user with this username and/or password already exits");
             }
         }
 
