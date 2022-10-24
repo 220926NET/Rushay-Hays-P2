@@ -36,7 +36,15 @@ namespace ReimburementP2api.Controllers
         [HttpPost]
         public IActionResult AddUser(User user)
         {
-            return CreatedAtAction("Get", new { id = user.Id }, user);
+            bool userWasAdded = _userRepository.AddUser(user);
+            if (userWasAdded)
+            {
+                return CreatedAtAction("Get", new { id = user.Id }, user);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         // PUT api/<UserController>/5

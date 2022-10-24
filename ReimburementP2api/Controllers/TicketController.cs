@@ -47,17 +47,39 @@ namespace ReimburementP2api.Controllers
         [HttpPost]
         public IActionResult AddTicket(Ticket ticket)
         {
-            _ticketRepository.AddTicket(ticket);
-            return CreatedAtAction(nameof(GetSingleTicket), new { ticketId = ticket.Id}, ticket);
-            //return CreatedAtAction("PostAsync",ticket);
+            bool ticketWasAdded = _ticketRepository.AddTicket(ticket);
+            if (ticketWasAdded)
+            {
+                return CreatedAtAction(nameof(GetSingleTicket), new { ticketId = ticket.Id}, ticket);
+
+            }
+            else
+            {
+                return BadRequest();
+            }
+            
         }
 
         // PUT api/<TicketController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, int statId)
+        public IActionResult Put(int id, int statId, bool hasAdminPrivelige)
         {
-            _ticketRepository.UpdateTicket(id, statId);
-            return NoContent();
+            if (hasAdminPrivelige)
+            {
+               bool wasUpdated =  _ticketRepository.UpdateTicket(id, statId);
+                if (wasUpdated)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE api/<TicketController>/5

@@ -56,24 +56,35 @@ namespace ReimburementP2api.Repositories
 
         }
 
-        public void AddUser(User user)
+        public bool AddUser(User user)
         {
             using (var conn = Connection)
             {
                 conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                User testUser = GetUserByUserNameAndPass(user.Username, user.Password);
+                //if the username isn't taken then testUser.Id will eqaul 0
+                if(testUser.Id == 0)
                 {
-                    cmd.CommandText = @"
-                        INSERT INTO Users
-                        (Name, UserName, Password, Email, IsAdmin)
-                        VALUES(@name, @userName, @pass, @email, 0);
-                    ";
-                    cmd.Parameters.AddWithValue("@name", user.Name);
-                    cmd.Parameters.AddWithValue("@userName", user.Username);
-                    cmd.Parameters.AddWithValue("@pass", user.Password);
-                    cmd.Parameters.AddWithValue("@email", user.Email);
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            INSERT INTO Users
+                            (Name, UserName, Password, Email, IsAdmin)
+                            VALUES(@name, @userName, @pass, @email, 0);
+                        ";
+                        cmd.Parameters.AddWithValue("@name", user.Name);
+                        cmd.Parameters.AddWithValue("@userName", user.Username);
+                        cmd.Parameters.AddWithValue("@pass", user.Password);
+                        cmd.Parameters.AddWithValue("@email", user.Email);
 
-                    cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+
                 }
             }
         }

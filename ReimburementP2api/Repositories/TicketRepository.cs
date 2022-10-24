@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using ReimburementP2api.Models;
 
 namespace ReimburementP2api.Repositories
@@ -49,45 +50,71 @@ namespace ReimburementP2api.Repositories
         }
 
         //add a new ticket to the database
-        public void AddTicket(Ticket ticket)
+        public bool AddTicket(Ticket ticket)
         {
-            using (var conn = Connection)
+            //these if else statements will ensure that the amount and note fields have some data
+            //in them before allowing the ticket to be created
+            if(!ticket.Note.IsNullOrEmpty())
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                if(ticket.AmountRequest != 0)
                 {
-                    cmd.CommandText = @"
-                        INSERT INTO Tickets
-                        (Note, AmountRequested, DateCreated, StatusId, UserId)
-                        VALUES (@tNote, @tAmount, @tDate, 1, @tUserId);
-                    ";
-                    cmd.Parameters.AddWithValue("@tNote", ticket.Note);
-                    cmd.Parameters.AddWithValue("@tAmount", ticket.AmountRequest);
-                    cmd.Parameters.AddWithValue("@tDate", ticket.DateCreated);
-                    cmd.Parameters.AddWithValue("@tUserId", ticket.UserId);
+                    using (var conn = Connection)
+                    {
+                        conn.Open();
+                        using (SqlCommand cmd = conn.CreateCommand())
+                        {
+                            cmd.CommandText = @"
+                                INSERT INTO Tickets
+                                (Note, AmountRequested, DateCreated, StatusId, UserId)
+                                VALUES (@tNote, @tAmount, @tDate, 1, @tUserId);
+                            ";
+                            cmd.Parameters.AddWithValue("@tNote", ticket.Note);
+                            cmd.Parameters.AddWithValue("@tAmount", ticket.AmountRequest);
+                            cmd.Parameters.AddWithValue("@tDate", ticket.DateCreated);
+                            cmd.Parameters.AddWithValue("@tUserId", ticket.UserId);
 
-                    cmd.ExecuteNonQuery();
+                            cmd.ExecuteNonQuery();
+                            return true;
+                        }
+                    }
                 }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 
         //Update a ticket's status
-        public void UpdateTicket(int tID, int statID)
+        public bool UpdateTicket(int tID, int statID)
         {
             using (var conn = Connection)
             {
                 conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                Ticket ticketCheck = GetTicketById(tID);
+                if(ticketCheck.Status == "PENDING")
                 {
-                    cmd.CommandText = @"
-                        UPDATE Tickets
-                        SET StatusId = @statID
-                        WHERE Id = @tID;
-                    ";
-                    cmd.Parameters.AddWithValue("@statID", statID);
-                    cmd.Parameters.AddWithValue("@tID", tID);
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            UPDATE Tickets
+                            SET StatusId = @statID
+                            WHERE Id = @tID;
+                        ";
+                        cmd.Parameters.AddWithValue("@statID", statID);
+                        cmd.Parameters.AddWithValue("@tID", tID);
 
-                    cmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
                 }
 
             }
